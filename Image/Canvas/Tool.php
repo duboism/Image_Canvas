@@ -74,7 +74,7 @@ class Image_Canvas_Tool
         static $_fontMap;
         
         if (!is_array($_fontMap)) {
-            if (file_exists($fontmap = (dirname(__FILE__) . '/Fonts/fontmap.txt'))) {
+            if (file_exists($fontmap = (IMAGE_CANVAS_FONT_PATH . '/fontmap.txt'))) {
                 $file = file($fontmap);
                 foreach ($file as $fontmapping) {
                     list($fontname, $filenames) = explode(',', $fontmapping, 2);
@@ -107,7 +107,7 @@ class Image_Canvas_Tool
             $result = $filename;
         } elseif (file_exists($file = (IMAGE_CANVAS_SYSTEM_FONT_PATH . $filename))) {
             $result = $file;
-        } elseif (file_exists($file = (dirname(__FILE__) . '/Fonts/' . $filename))) {
+        } elseif (file_exists($file = (IMAGE_CANVAS_FONT_PATH . $filename))) {
             $result = $file;
         } elseif (substr($name, 0, 1) !== '/') {
             // leave it to the library to find the font

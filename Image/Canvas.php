@@ -48,6 +48,13 @@ if (!defined('IMAGE_CANVAS_SYSTEM_FONT_PATH')) {
 }
 
 /**
+ * Specfies the path to the library location of font files.
+ *
+ * Remember trailing slash!
+ */
+define('IMAGE_CANVAS_FONT_PATH', dirname(__FILE__) . '/Canvas/Fonts/');
+
+/**
  *  Class for handling different output formats
  * 
  * @category  Images
