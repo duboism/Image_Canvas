@@ -26,13 +26,20 @@
  * @version   SVN: $Id$
  * @link      http://pear.php.net/package/Image_Canvas
  */
-  
-// SPECIFY HERE WHERE A TRUETYPE FONT CAN BE FOUND
-$testFont = 'c:/windows/fonts/Arial.ttf';
 
 require_once 'vendor/autoload.php';
 
 $canvas =& Image_Canvas::factory('ps', array('page' => 'A4', 'align' => 'center', 'width' => 600, 'height' => 600, 'filename'=>'testps.ps'));
+
+// Change the font to verdana
+// We explicitly set the path to the font
+// pslib needs the AFM format
+$canvas->setDefaultFont(
+    array(
+        'name' => 'verdana',
+        'file' => IMAGE_CANVAS_FONT_PATH . 'verdana.afm',
+    )
+);
 
 require_once __DIR__ . '/canvas_body.php';
 
