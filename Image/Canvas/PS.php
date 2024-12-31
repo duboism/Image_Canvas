@@ -225,8 +225,6 @@ class Image_Canvas_PS extends Image_Canvas
             }
         }
 
-        $this->setDefaultFont(array('name' => 'Helvetica', 'color' => 'black', 'size' => 9));
-
         if ((isset($param['orientation'])) && (strtoupper($param['orientation']) == 'LANDSCAPE')) {
             $w = $this->_pageWidth;
             $this->_pageWidth = $this->_pageHeight;
