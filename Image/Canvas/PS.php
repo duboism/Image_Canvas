@@ -329,6 +329,15 @@ class Image_Canvas_PS extends Image_Canvas
         $this->_reset();
 
         $this->_pslib = $this->_version();
+
+        // Add some path to PSlib search path
+        // This is needed because ps_findfont only look in the current path
+        // We add:
+        //   - IMAGE_CANVAS_SYSTEM_FONT_PATH
+        //   - IMAGE_CANVAS_FONT_PATH
+        // See also _setFont
+        ps_set_parameter($this->_ps, 'SearchPath', IMAGE_CANVAS_SYSTEM_FONT_PATH);
+        ps_set_parameter($this->_ps, 'SearchPath', IMAGE_CANVAS_FONT_PATH);
     }
 
     /**
@@ -445,7 +454,11 @@ class Image_Canvas_PS extends Image_Canvas
     {
         $this->_psFont = false;
         if (isset($this->_font['name'])) {
+            // TODO: the following line seems to come from PDFlib,
+            //       not sure that is useful for PS
             ps_set_parameter($this->_ps, 'FontOutline', $this->_font['name'] . '=' . $this->_font['file']);
+            // Add dir of the font to PSlib search path (see contructor)
+            ps_set_parameter($this->_ps, 'SearchPath', dirname($this->_font['file']));
             $this->_psFont = ps_findfont($this->_ps, $this->_font['name'], $this->_font['encoding'], $this->_font['embed']);
 
             if ($this->_psFont) {
