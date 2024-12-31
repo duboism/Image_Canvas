@@ -34,6 +34,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         coverage: none
+        extensions: ps
         ini-values: post_max_size=256M, max_execution_time=180
     - name: Check package
       run: |
@@ -55,6 +56,10 @@ jobs:
         curl -L -o verdan32.exe 'http://download.sourceforge.net/corefonts/verdan32.exe'
         cabextract -d Image/Canvas/Fonts/ verdan32.exe
         mv Image/Canvas/Fonts/Verdana.TTF Image/Canvas/Fonts/verdana.ttf
+    - name: Convert Verdana to AFM
+      run: |
+          sudo apt install -y texlive-binaries
+          ttf2afm Image/Canvas/Fonts/verdana.ttf > Image/Canvas/Fonts/verdana.afm
     - name: Install pre-requisites and run test scripts
       run: |
         composer install
@@ -62,7 +67,7 @@ jobs:
         php tests/imagemap.php > imagemap.html
         php tests/png.php
         php tests/jpg.php
-        # php tests/ps.php
+        php tests/ps.php
         # php tests/pdf.php
         php tests/svg.php
         php tests/text.php > text.png
