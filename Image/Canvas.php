@@ -335,7 +335,7 @@ class Image_Canvas
         
         if ((!isset($this->_font['file'])) && (isset($this->_font['name']))) {
             include_once 'Image/Canvas/Tool.php';
-            $this->_font['file'] = Image_Canvas_Tool::fontMap($this->_font['name']);
+            $this->_font['file'] = Image_Canvas_Font_Tools::fontMap($this->_font['name']);
         }
     }
 
@@ -432,7 +432,7 @@ class Image_Canvas
         $x1 = $this->_getX($params['x1']);
         $y1 = $this->_getY($params['y1']);
         if (isset($params['end0'])) {
-            $angle = Image_Canvas_Tool::getAngle($x1, $y1, $x0, $y0);
+            $angle = Image_Canvas_Geometric_Tools::getAngle($x1, $y1, $x0, $y0);
             $this->drawEnd(
                 array(
                     'end' => $params['end0'], 
@@ -445,7 +445,7 @@ class Image_Canvas
             );
         }    
         if (isset($params['end1'])) {
-            $angle = Image_Canvas_Tool::getAngle($x0, $y0, $x1, $y1);
+            $angle = Image_Canvas_Geometric_Tools::getAngle($x0, $y0, $x1, $y1);
             //print "<pre>"; var_dump($params, $angle); print "</pre>";
             $this->drawEnd(
                 array(

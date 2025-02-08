@@ -30,10 +30,10 @@
  */
 
 /**
- * This class contains a set of tool-functions.
- * 
+ * This class contains a set of methods related to fonts.
+ *
  * These functions are all to be called statically
- * 
+ *
  * @category  Images
  * @package   Image_Canvas
  * @author    Jesper Veggerby <pear.nosey@veggerby.dk>
@@ -44,7 +44,7 @@
  * @link      http://pear.php.net/package/Image_Canvas
  * @abstract
  */
-class Image_Canvas_Tool
+class Image_Canvas_Font_Tools
 {
 
     /**
@@ -116,7 +116,25 @@ class Image_Canvas_Tool
         
         return str_replace('\\', '/', $result); 
     }
-    
+}
+
+/**
+ * This class contains a set of methods related to geometry.
+ *
+ * These functions are all to be called statically
+ *
+ * @category  Images
+ * @package   Image_Canvas
+ * @author    Jesper Veggerby <pear.nosey@veggerby.dk>
+ * @author    Stefan Neufeind <pear.neufeind@speedpartner.de>
+ * @copyright 2003-2009 The PHP Group
+ * @license   http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
+ * @version   Release: @package_version@
+ * @link      http://pear.php.net/package/Image_Canvas
+ * @abstract
+ */
+class Image_Canvas_Geometric_Tools
+{
     /**
      * Return the average of 2 points
      *
@@ -161,12 +179,12 @@ class Image_Canvas_Tool
      */
     static function controlPoint($p1, $p2, $factor, $smoothFactor = 0.75)
     {
-        $sa = Image_Canvas_Tool::mirror($p1, $p2, $smoothFactor);
-        $sb = Image_Canvas_Tool::mid($p2, $sa);
+        $sa = Image_Canvas_Geometric_Tools::mirror($p1, $p2, $smoothFactor);
+        $sb = Image_Canvas_Geometric_Tools::mid($p2, $sa);
 
-        $m = Image_Canvas_Tool::mid($p2, $factor);
+        $m = Image_Canvas_Geometric_Tools::mid($p2, $factor);
 
-        $pC = Image_Canvas_Tool::mid($sb, $m);
+        $pC = Image_Canvas_Geometric_Tools::mid($sb, $m);
 
         return $pC;
     }
@@ -193,10 +211,10 @@ class Image_Canvas_Tool
             3 * (1 - $t) * pow($t, 2) * $p3 +
             pow($t, 3) * $p4;
     }
-    
+
     /**
      * Gets the angle / slope of a line relative to horizontal (left -> right)
-     * 
+     *
      * @param double $x0 The starting x point
      * @param double $y0 The starting y point
      * @param double $x1 The ending x point
@@ -207,7 +225,7 @@ class Image_Canvas_Tool
      */
     static function getAngle($x0, $y0, $x1, $y1)
     {
-        
+
         $dx = ($x1 - $x0);
         $dy = ($y1 - $y0);
         $l = sqrt($dx * $dx + $dy * $dy);
@@ -216,7 +234,7 @@ class Image_Canvas_Tool
             $v = 180 - $v;
         }
         return $v;
-        
+
     }
 
 }

@@ -615,7 +615,7 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
         parent::setFont($fontOptions);
 
         if (isset($this->_font['ttf'])) {
-            $this->_font['file'] = str_replace('\\', '/', Image_Canvas_Tool::fontMap($this->_font['ttf']));
+            $this->_font['file'] = str_replace('\\', '/', Image_Canvas_Font_Tools::fontMap($this->_font['ttf']));
         } elseif (!isset($this->_font['font'])) {
             $this->_font['font'] = 1;
         }
@@ -978,7 +978,7 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
                 if ($d > 0) {
                     $interval = 1 / $d;
                     for ($t = 0; $t <= 1; $t = $t + $interval) {
-                        $x = Image_Canvas_Tool::bezier(
+                        $x = Image_Canvas_Geometric_Tools::bezier(
                             $t,
                             $lastPoint['X'],
                             $lastPoint['P1X'],
@@ -986,7 +986,7 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
                             $point['X']
                         );
     
-                        $y = Image_Canvas_Tool::bezier(
+                        $y = Image_Canvas_Geometric_Tools::bezier(
                             $t,
                             $lastPoint['Y'],
                             $lastPoint['P1Y'],
@@ -1018,7 +1018,7 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
                         $polygon[] = $y;
                     }
                     if (($t - $interval) < 1) {
-                        $x = Image_Canvas_Tool::bezier(
+                        $x = Image_Canvas_Geometric_Tools::bezier(
                             1,
                             $lastPoint['X'],
                             $lastPoint['P1X'],
@@ -1026,7 +1026,7 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
                             $point['X']
                         );
     
-                        $y = Image_Canvas_Tool::bezier(
+                        $y = Image_Canvas_Geometric_Tools::bezier(
                             1,
                             $lastPoint['Y'],
                             $lastPoint['P1Y'],
@@ -1578,7 +1578,7 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
                     } else if ($alignment['vertical'] == 'center') {
                         $y -= $height / 2;
                     }
-                    if ((isset($this->_font['vertical'])) && ($this->_font['vertical'])) {                      
+                    if ((isset($this->_font['vertical'])) && ($this->_font['vertical'])) {
                         ImageStringUp(
                             $this->_canvas,
                             $this->_font['font'],
