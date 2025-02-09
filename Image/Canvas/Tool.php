@@ -46,6 +46,112 @@
  */
 class Image_Canvas_Font_Tools
 {
+    // The singleton
+    private static $_instance;
+
+    // Properties
+    // TODO: visibility
+    public $system_font_path;
+    public $lib_font_path;
+    public $_font_map;  // private
+    public $_save_font_map;  // private
+
+    /**
+     * Private constructor
+     */
+    private function __construct()
+    {
+        // Initialize system_font_path
+        $this->system_font_path = [];
+        if (isset($_SERVER['SystemRoot'])) {
+            // Windows-case: the fonts are in the Fonts/ directory
+            $this->system_font_path[] = $_SERVER['SystemRoot'] . '/Fonts/';
+        } else {
+            // Unix/Mac: try reasonable paths
+            $potential_paths = array(
+                // Unix
+                "/usr/share/fonts/",
+                "/usr/share/X11/fonts/Type1/",
+                "/usr/share/X11/fonts/TTF/",
+                "/usr/local/share/fonts/",
+                // Mac
+                "/Library/Fonts/",
+                "~/Library/Fonts/",
+            );
+            foreach ($potential_paths as $potential_path) {
+                if (is_dir($potential_path)) {
+                    $this->system_font_path[] = $potential_path;
+                }
+            }
+        }
+
+        // Initialize library font path
+        $this->lib_font_path = dirname(__FILE__) . '/Fonts/';
+
+        // Initialize font_map
+        $this->_readFontDB();
+        $this->_save_font_map = false;
+    }
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        // Write DB
+        if ($this->_save_font_map) {
+            $this->_writeFontDB();
+        }
+    }
+
+    /**
+     * Read the font DB (this called in __construct)
+     *
+     * @return null
+     */
+    private function _readFontDB()
+    {
+        $this->_font_map = array();
+        if (file_exists($fontmap = ($this->lib_font_path . 'fontmap.txt'))) {
+            $file = fopen($fontmap, 'r');
+            while (($data = fgetcsv($file, 0, ',')) !== false) {
+                $font_name = $data[0];
+                foreach (array_slice($data, 1) as $filename) {
+                    $type_pos = strrpos($filename, '.');
+                    $type = substr($filename, $type_pos);
+                    $this->_font_map[$font_name][$type] = $filename;
+                }
+            }
+            fclose($file);
+        }
+    }
+
+    /**
+     * Write the font DB (this is called on destruction)
+     *
+     * @return null
+     */
+    private function _writeFontDB()
+    {
+        $fontmap = $this->lib_font_path . 'fontmap.txt';
+        $file = fopen($fontmap, 'w');
+        foreach ($this->_font_map as $font => $formats) {
+            $data = array($font) + $formats;
+            fputcsv($file, $data, ',');
+        }
+        fclose($file);
+    }
+
+    /**
+     * Public method to get the instance
+     */
+    public static function getInstance()
+    {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new Image_Canvas_Font_Tools();
+        }
+        return self::$_instance;
+    }
 
     /**
      * Maps a font name to an actual font file (fx. a .ttf file)
@@ -69,29 +175,11 @@ class Image_Canvas_Font_Tools
      * @return string The filename of the font
      * @static
      */
-    static function fontMap($name, $type = '.ttf')
+    function fontMap($name, $type = '.ttf')
     {
-        static $_fontMap;
-        
-        if (!is_array($_fontMap)) {
-            if (file_exists($fontmap = (dirname(__FILE__) . '/Fonts/fontmap.txt'))) {
-                $file = file($fontmap);
-                foreach ($file as $fontmapping) {
-                    list($fontname, $filenames) = explode(',', $fontmapping, 2);
-                    $fontname = trim($fontname);
-                    $filenames = trim($filenames);
-                    $filenames = explode(',', $filenames);
-                    foreach ($filenames as $filename) {
-                        $type_pos = strrpos($filename, '.');
-                        $type = substr($filename, $type_pos);
-                        $_fontMap[$fontname][$type] = $filename;
-                    }
-                }
-            }
-        }
-        
         $type = strtolower($type);
-        
+        $_fontMap = $this->_font_map;
+
         if ((isset($_fontMap[$name])) && (isset($_fontMap[$name][$type]))) {
             $filename = $_fontMap[$name][$type];
         } else {
@@ -103,19 +191,58 @@ class Image_Canvas_Font_Tools
         }
 
         $result = false;
-        if (file_exists($filename)) {
-            $result = $filename;
-        } elseif (file_exists($file = (IMAGE_CANVAS_SYSTEM_FONT_PATH . $filename))) {
-            $result = $file;
-        } elseif (file_exists($file = (dirname(__FILE__) . '/Fonts/' . $filename))) {
-            $result = $file;
-        } elseif (substr($name, 0, 1) !== '/') {
-            // leave it to the library to find the font
-            $result = $name;
-        } 
-        
-        return str_replace('\\', '/', $result); 
+        $dirs = array_merge(
+            array('.'),
+            $this->system_font_path,
+            array($this->lib_font_path)
+        );
+        foreach ($dirs as $dir) {
+            $file = $dir . $filename;
+            if (file_exists($file)) {
+                $result = $file;
+                return str_replace('\\', '/', $result);
+            }
+        }
+
+        return false;
     }
+
+    /**
+     * Install a font and update font map
+     *
+     * @param string $name The font name
+     * @param string $path The file containing the font
+     * @param string $type The type. If null, infered from extension
+     *
+     * @return bool Installation successful?
+     */
+    function installFont($name, $path, $type = null)
+    {
+        $filename = basename($path);
+        // Get type from filename
+        if (!$type) {
+            $type_pos = strrpos($filename, '.');
+            $type = substr($filename, $type_pos);
+        }
+        $type = strtolower($type);
+
+        if (isset($this->_font_map[$name][$type])) {
+            echo('Already there');
+            return;
+        }
+
+        // Copy file & update map
+        $local_path = $this->lib_font_path . $filename;
+        copy($path, $local_path);
+        $this->_font_map[$name][$type] = $filename;
+        $this->_save_font_map = true;
+    }
+
+    function installWebFonts()
+    {
+        // TODO
+    }
+
 }
 
 /**

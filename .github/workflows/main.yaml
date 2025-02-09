@@ -47,14 +47,15 @@ jobs:
         sudo pear package-validate
         sudo pear install --force *.tgz
         sudo pear list
-    # For some reason ttf-mscorefonts-installer doesn't work
-    # so we only install Verdana
+    # Download Verdana font and install it
+    # We use the new font tool
     - name: Download and install Verdana font
       run: |
         sudo apt install cabextract
         curl -L -o verdan32.exe 'http://download.sourceforge.net/corefonts/verdan32.exe'
-        cabextract -d Image/Canvas/Fonts/ verdan32.exe
-        mv Image/Canvas/Fonts/Verdana.TTF Image/Canvas/Fonts/verdana.ttf
+        cabextract verdan32.exe
+        mv Verdana.TTF Verdana.ttf
+        php -r 'require("Image/Canvas/Tool.php"); $font = Image_Canvas_Font_Tools::getInstance(); $font->installFont("Verdana", "Verdana.ttf");'
     - name: Install pre-requisites and run test scripts
       run: |
         composer install

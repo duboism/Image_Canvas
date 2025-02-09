@@ -29,23 +29,6 @@
  * @link      http://pear.php.net/package/Image_Canvas
  */
 
-/**
- * Specfies the path to the system location of font files.
- *
- * Remember trailing slash!
- *
- * This is set by default on Windows systems to %SystemRoot%\Fonts\
- */
-if (!defined('IMAGE_CANVAS_SYSTEM_FONT_PATH')) {
-    if (isset($_SERVER['SystemRoot'])) {
-        define('IMAGE_CANVAS_SYSTEM_FONT_PATH', $_SERVER['SystemRoot'] . '/Fonts/');
-    } else {
-        /**
-          * @ignore
-          */
-        define('IMAGE_CANVAS_SYSTEM_FONT_PATH', '');
-    }
-}
 
 /**
  *  Class for handling different output formats
@@ -331,11 +314,6 @@ class Image_Canvas
             ) {
                 $this->_font['vertical'] = true;
             }
-        }
-        
-        if ((!isset($this->_font['file'])) && (isset($this->_font['name']))) {
-            include_once 'Image/Canvas/Tool.php';
-            $this->_font['file'] = Image_Canvas_Font_Tools::fontMap($this->_font['name']);
         }
     }
 

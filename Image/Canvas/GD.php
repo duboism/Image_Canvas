@@ -44,6 +44,11 @@ require_once 'Image/Canvas/WithMap.php';
 require_once 'Image/Canvas/Color.php';
 
 /**
+ * Include file Image/Canvas/Tool.php
+ */
+require_once 'Image/Canvas/Tool.php';
+
+/**
  * Canvas class to output using PHP GD support.
  * 
  * @category  Images
@@ -614,9 +619,20 @@ class Image_Canvas_GD extends Image_Canvas_WithMap
     {
         parent::setFont($fontOptions);
 
+        // Find the font
+        $font_tools = Image_Canvas_Font_Tools::getInstance();
         if (isset($this->_font['ttf'])) {
-            $this->_font['file'] = str_replace('\\', '/', Image_Canvas_Font_Tools::fontMap($this->_font['ttf']));
+            if ($filename = $font_tools->fontMap($this->font['ttf'])) {
+                $this->font['file'] = $filename;
+            }
+        } elseif ((!isset($this->_font['file'])) && (isset($this->_font['name']))) {
+            // Try to find the TTF file from font name
+            $filename = $font_tools->fontMap($this->_font['name']);
+            if ($filename) {
+                $this->_font['file'] = $filename;
+            }
         } elseif (!isset($this->_font['font'])) {
+            // Default GD font
             $this->_font['font'] = 1;
         }
 
